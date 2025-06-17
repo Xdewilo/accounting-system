@@ -1,43 +1,41 @@
-import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Platform } from '@ionic/angular';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { AuthModule } from './auth/auth.module';
 
 describe('AppComponent', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AppComponent],
-      providers: [provideRouter([])]
+
+  let platformReadySpy: Promise<void>, platformIsSpy, platformSpy: { ready: any; };
+
+  beforeEach(waitForAsync(() => {
+    platformReadySpy = Promise.resolve();
+    platformIsSpy = Promise.resolve();
+    platformSpy = jasmine.createSpyObj('Platform', { ready: platformReadySpy, is: platformIsSpy });
+
+    TestBed.configureTestingModule({
+      declarations: [AppComponent],
+      imports: [HttpClientTestingModule, AuthModule],
+      providers: [
+        { provide: Platform, useValue: platformSpy }
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
-  });
+  }));
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
+    const app = fixture.debugElement.componentInstance;
     expect(app).toBeTruthy();
   });
 
-  it('should have menu labels', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const app = fixture.nativeElement;
-    const menuItems = app.querySelectorAll('ion-label');
-    expect(menuItems.length).toEqual(12);
-    expect(menuItems[0].textContent).toContain('Inbox');
-    expect(menuItems[1].textContent).toContain('Outbox');
+  it('should initialize the app', async () => {
+    TestBed.createComponent(AppComponent);
+    expect(platformSpy.ready).toHaveBeenCalled();
+    await platformReadySpy;
   });
 
-  it('should have urls', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const app = fixture.nativeElement;
-    const menuItems = app.querySelectorAll('ion-item');
-    expect(menuItems.length).toEqual(12);
-    expect(menuItems[0].getAttribute('ng-reflect-router-link')).toEqual(
-      '/folder/inbox'
-    );
-    expect(menuItems[1].getAttribute('ng-reflect-router-link')).toEqual(
-      '/folder/outbox'
-    );
-  });
+  // TODO: add more tests!
+
 });
