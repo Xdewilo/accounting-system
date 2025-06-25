@@ -26,6 +26,5 @@ public class Account {
     @JoinColumn(name = "cuenta_padre_id")
     private Account parentAccount;
 
-    // Getters and setters
 }
 
