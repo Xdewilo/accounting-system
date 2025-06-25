@@ -8,6 +8,7 @@ public class ContafluxApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ContafluxApplication.class, args);
+		System.println("testing#1")
 	}
 
 }
